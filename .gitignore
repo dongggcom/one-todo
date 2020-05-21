@@ -1,0 +1,22 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+node_modules/.cache
+
+# Optional npm cache directory
+.npm
+
+# Build by command
+dist/
+
+### macOS template
+# General
+.DS_Store
+
+### Vscode
+# Set
+.vscode/

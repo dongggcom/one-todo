@@ -1,0 +1,72 @@
+{
+  "name": "one-todo",
+  "version": "0.1.0",
+  "description": "a vscode plugin about todo list",
+  "main": "src/index.js",
+  "engines": {
+    "vscode": "^1.45.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dongggcom/one-todo.git"
+  },
+  "keywords": [
+    "vscode",
+    "plugin",
+    "todo"
+  ],
+  "icon": "images/one-todo@128x128.png",
+  "author": "dongggcom",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dongggcom/one-todo/issues"
+  },
+  "homepage": "https://github.com/dongggcom/one-todo#readme",
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "one-todo插件设置",
+      "properties": {
+        "oneTodo.showHomepage": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启动时显示首页"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "one-todo-icon",
+          "title": "TODO",
+          "icon": "images/one-todo.svg"
+        }
+      ]
+    },
+    "views": {
+      "one-todo-icon": [
+        {
+          "id": "todo",
+          "name": "TODO列表"
+        },
+        {
+          "id": "untodo",
+          "name": "UN-TODO列表"
+        },
+        {
+          "id": "other",
+          "name": "其他"
+        }
+      ]
+    }
+  }
+}
