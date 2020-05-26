@@ -2,16 +2,13 @@
   "name": "one-todo",
   "version": "0.1.0",
   "description": "a vscode plugin about todo list",
-  "main": "src/index.js",
+  "main": "./dist/index.js",
   "engines": {
     "vscode": "^1.45.0"
   },
   "categories": [
     "Other"
   ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dongggcom/one-todo.git"
@@ -43,6 +40,12 @@
         }
       }
     },
+    "commands": [
+      {
+        "command": "extension.main.homepage",
+        "title": "显示自定义首页"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -68,5 +71,16 @@
         }
       ]
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^8.10.25",
+    "@types/vscode": "^1.34.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   }
 }
