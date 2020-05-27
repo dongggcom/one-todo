@@ -2,7 +2,7 @@
   "name": "one-todo",
   "version": "0.1.0",
   "description": "a vscode plugin about todo list",
-  "main": "./dist/index.js",
+  "main": "./out/extension.js",
   "engines": {
     "vscode": "^1.45.0"
   },
@@ -42,8 +42,17 @@
     },
     "commands": [
       {
-        "command": "extension.main.homepage",
-        "title": "显示自定义首页"
+        "command": "catCoding.start",
+        "title": "Start new cat coding session",
+        "category": "Cat Coding"
+      },
+      {
+        "command": "extension.sayHello",
+        "title": "hello!"
+      },
+      {
+        "command": "extension.main.showHomepage",
+        "title": "显示首页"
       }
     ],
     "viewsContainers": {
@@ -55,6 +64,15 @@
         }
       ]
     },
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorFocus",
+          "command": "extension.sayHello",
+          "group": "navigation"
+        }
+      ]
+    },
     "views": {
       "one-todo-icon": [
         {
@@ -62,7 +80,7 @@
           "name": "TODO列表"
         },
         {
-          "id": "untodo",
+          "id": "un-todo",
           "name": "UN-TODO列表"
         },
         {
