@@ -96,7 +96,7 @@
           "type": "number",
           "default": 5120,
           "description": "最大查询行数"
-      }
+        }
       }
     },
     "commands": [
