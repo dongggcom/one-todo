@@ -40,17 +40,77 @@
           "type": "boolean",
           "default": true,
           "description": "是否启动时显示首页"
+        },
+        "oneTodo.makeTodoFile": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否生成TODO文件"
+        },
+        "oneTodo.include": {
+          "description": "包含文件",
+          "type": "array",
+          "default": [
+            "**/*.js",
+            "**/*.jsx",
+            "**/*.ts",
+            "**/*.tsx",
+            "**/*.html",
+            "**/*.php",
+            "**/*.css",
+            "**/*.scss"
+          ],
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "按照glob定义包含文件，禁止使用 `**/*.*` 或匹配二进制文件"
+              }
+            ]
         }
+        },
+        "oneTodo.exclude": {
+          "description": "排除文件",
+          "type": "array",
+          "default": [
+            "**/node_modules/**",
+            "**/bower_components/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/.vscode/**",
+            "**/.github/**",
+            "**/_output/**",
+            "**/*.min.*",
+            "**/*.map",
+            "**/.next/**"
+          ],
+          "items": {
+            "anyOf": [
+              {
+                "type": "string",
+                "description": "按照glob定义排除文件"
+              }
+            ]
+          }
+        },
+        "oneTodo.maxFilesForSearch": {
+          "type": "number",
+          "default": 5120,
+          "description": "最大查询行数"
+      }
       }
     },
     "commands": [
       {
         "command": "extension.sayHello",
-        "title": "hello!"
+        "title": "one-todo: hello!"
       },
       {
         "command": "extension.main.showHomepage",
-        "title": "显示首页"
+        "title": "one-todo: 显示首页"
+      },
+      {
+        "command": "extension.main.showAllAnnotations",
+        "title": "one-todo: 显示全部注解"
       }
     ],
     "viewsContainers": {
