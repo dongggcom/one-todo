@@ -26,14 +26,14 @@ module.exports = (context) => {
     triggerUpdateDecorations();
   }
 
-  // 编辑器变化时
+  // 编辑器激活后
   window.onDidChangeActiveTextEditor(function (editor) {
     if (activeEditor) {
         triggerUpdateDecorations();
     }
   }, null, context.subscriptions);
 
-  // 编辑器结束变化时
+  // 编辑器变化后
   workspace.onDidChangeTextDocument(function (event) {
     if (activeEditor && event.document === activeEditor.document) {
         triggerUpdateDecorations();
@@ -137,7 +137,9 @@ module.exports = (context) => {
             // 最终输出
             if (times === totalFiles || window.manullyCancel) {
                 window.processing = true;
-                annotationList = annotationList.concat(Object.values(annotations).map(v =>v[0]))
+                annotationList = annotationList.concat(
+                  Object.values(annotations).reduce((acc, fileAnnotations) => acc.concat(fileAnnotations), [])
+                )
                 workspaceState.update('annotationList', annotationList);
                 setStatusMsg(defaultIcon, annotationList.length, annotationList.length + ' result(s) found');
                 showOutput(annotationList);
@@ -163,40 +165,34 @@ module.exports = (context) => {
     });
   }
 
+  // 输出注解
+  function showOutput(data) {
+    if (!window.outputChannel) return;
+    window.outputChannel.clear();
 
-function showOutput(data) {
-  if (!window.outputChannel) return;
-  window.outputChannel.clear();
+    if (data.length === 0) {
+        window.showInformationMessage('No results');
+        return;
+    }
 
-  if (data.length === 0) {
-      window.showInformationMessage('No results');
-      return;
+    data.forEach(function (v, i, a) {
+        // due to an issue of vscode(https://github.com/Microsoft/vscode/issues/586), in order to make file path clickable within the output channel,the file path differs from platform
+        var patternA = '#' + (i + 1) + '\t' + v.uri + ':' + (v.lineNum + 1);
+        var patternB = '#' + (i + 1) + '\t' + v.uri + ':' + (v.lineNum + 1) + ':' + (v.startCol + 1);
+        var patterns = [patternA, patternB];
+
+        //for windows and mac
+        var patternType = 0;
+        if (os.platform() == "linux") {
+            // for linux
+            patternType = 1;
+        }
+
+        window.outputChannel.appendLine(patterns[patternType]);
+        window.outputChannel.appendLine('\t' + v.label + '\n');
+    });
+    window.outputChannel.show();
   }
-
-  var settings = workspace.getConfiguration('todohighlight');
-  var toggleURI = settings.get('toggleURI', false);
-
-  data.forEach(function (v, i, a) {
-      // due to an issue of vscode(https://github.com/Microsoft/vscode/issues/586), in order to make file path clickable within the output channel,the file path differs from platform
-      var patternA = '#' + (i + 1) + '\t' + v.uri + '#' + (v.lineNum + 1);
-      var patternB = '#' + (i + 1) + '\t' + v.uri + ':' + (v.lineNum + 1) + ':' + (v.startCol + 1);
-      var patterns = [patternA, patternB];
-
-      //for windows and mac
-      var patternType = 0;
-      if (os.platform() == "linux") {
-          // for linux
-          patternType = 1;
-      }
-      if (toggleURI) {
-          //toggle the pattern
-          patternType = +!patternType;
-      }
-      window.outputChannel.appendLine(patterns[patternType]);
-      window.outputChannel.appendLine('\t' + v.label + '\n');
-  });
-  window.outputChannel.show();
-}
 
   // 文件中查询注解，并装填 annotations 和 annotationList
   function searchAnnotationInFile(file, regexp) {
