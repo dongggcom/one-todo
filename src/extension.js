@@ -5,8 +5,6 @@
  */
 exports.activate = function(context) {
   console.log('恭喜，您的扩展“one-todo”已被激活！');
-  require('./homepage')(context); // 首页
-  require('./helloworld')(context); // hello word
   require('./todo')(context); // TODO
 };
 
