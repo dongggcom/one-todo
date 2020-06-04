@@ -99,14 +99,6 @@
     },
     "commands": [
       {
-        "command": "extension.sayHello",
-        "title": "one-todo: hello!"
-      },
-      {
-        "command": "extension.todo.showHomepage",
-        "title": "one-todo: 显示首页"
-      },
-      {
         "command": "extension.todo.showAllAnnotations",
         "title": "one-todo: 显示全部注解"
       },
@@ -129,12 +121,6 @@
       ]
     },
     "menus": {
-      "editor/context": [
-        {
-          "command": "extension.sayHello",
-          "group": "navigation"
-        }
-      ],
       "view/title": [
 				{
 					"command": "extension.todo.refreshTodoList",

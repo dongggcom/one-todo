@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 const vscode = require('vscode');
 const os = require("os");
