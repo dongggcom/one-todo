@@ -89,13 +89,14 @@ module.exports = (context) => {
 
     this._onDidChangeTreeData = new vscode.EventEmitter();
     this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-    this.refresh = () => this._onDidChangeTreeData.fire();
-    this.annotations = searchAnnotations(workspaceState, pattern).then(threeItemFomatter)
+    this.refresh = function() {
+      this._onDidChangeTreeData.fire()
+    };
     this.getTreeItem = function(element) {
       return element;
     }
     this.getChildren = function() {
-      return this.annotations
+      return searchAnnotations(workspaceState, pattern).then(threeItemFomatter)
     }
   }
 
