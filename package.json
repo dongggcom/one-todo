@@ -9,9 +9,6 @@
   "categories": [
     "Other"
   ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dongggcom/one-todo.git"
@@ -29,7 +26,8 @@
   },
   "homepage": "https://github.com/dongggcom/one-todo#readme",
   "activationEvents": [
-    "*"
+    "*",
+    "onView:showOutput"
   ],
   "contributes": {
     "configuration": {
@@ -66,7 +64,7 @@
                 "description": "按照glob定义包含文件，禁止使用 `**/*.*` 或匹配二进制文件"
               }
             ]
-        }
+          }
         },
         "oneTodo.exclude": {
           "description": "排除文件",
@@ -105,19 +103,27 @@
         "title": "one-todo: hello!"
       },
       {
-        "command": "extension.main.showHomepage",
+        "command": "extension.todo.showHomepage",
         "title": "one-todo: 显示首页"
       },
       {
-        "command": "extension.main.showAllAnnotations",
+        "command": "extension.todo.showAllAnnotations",
         "title": "one-todo: 显示全部注解"
-      }
+      },
+      {
+				"command": "extension.todo.refreshTodoList",
+				"title": "刷新",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			}
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "one-todo-icon",
-          "title": "TODO",
+          "id": "showOutput",
+          "title": "ONE-TODO",
           "icon": "images/one-todo.svg"
         }
       ]
@@ -125,27 +131,34 @@
     "menus": {
       "editor/context": [
         {
-          "when": "editorFocus",
           "command": "extension.sayHello",
           "group": "navigation"
+        }
+      ],
+      "view/title": [
+				{
+					"command": "extension.todo.refreshTodoList",
+					"when": "view == todoList",
+					"group": "navigation"
         }
       ]
     },
     "views": {
-      "one-todo-icon": [
+      "showOutput": [
         {
-          "id": "todo",
-          "name": "TODO列表"
-        },
-        {
-          "id": "un-todo",
-          "name": "UN-TODO列表"
-        },
-        {
-          "id": "other",
-          "name": "其他"
+          "id": "todoList",
+          "name": "待完成列表"
         }
       ]
     }
+  },
+  "devDependencies": {
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.6",
+    "eslint": "^4.11.0",
+    "@types/node": "^7.0.43"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

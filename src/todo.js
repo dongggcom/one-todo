@@ -29,36 +29,75 @@ module.exports = (context) => {
   // 编辑器激活后
   window.onDidChangeActiveTextEditor(function (editor) {
     if (activeEditor) {
-        triggerUpdateDecorations();
+      triggerUpdateDecorations();
     }
   }, null, context.subscriptions);
 
-  // 编辑器变化后
+  // 工作区变化后
   workspace.onDidChangeTextDocument(function (event) {
     if (activeEditor && event.document === activeEditor.document) {
-        triggerUpdateDecorations();
+      triggerUpdateDecorations();
     }
   }, null, context.subscriptions);
 
-  // 命令：extension.main.showAllAnnotations
-  context.subscriptions.push(vscode.commands.registerCommand('extension.main.showAllAnnotations', 
-    function () {
+  const showOutProvider = new ShowOutProvider()
+
+  // 为 view 提供 viewTree
+  window.registerTreeDataProvider('todoList', showOutProvider);
+
+  // 命令：extension.todo.showAllAnnotations
+  context.subscriptions.push(vscode.commands.registerCommand('extension.todo.showAllAnnotations', 
+    () => {
       if (isEmtpy(assembledData)) return;
 
       const availableAnnotationTypes = Object.keys(assembledData);
-      availableAnnotationTypes.unshift('ALL');
       chooseAnnotationType(availableAnnotationTypes).then(function (annotationType) {
-          if (isEmtpy(annotationType)) return;
-          var searchPattern = pattern;
-          if (annotationType != 'ALL') {
-              annotationType = escapeRegExp(annotationType);
-              searchPattern = new RegExp(annotationType);
-          }
-          searchAnnotations(workspaceState, searchPattern);
+        if (isEmtpy(annotationType)) return;
+        searchAnnotations(workspaceState, pattern, showOutput);
       });
-      
     }
   ));
+
+  // 注册命令：extension.todo.refreshTodoList
+  vscode.commands.registerCommand('extension.todo.refreshTodoList',
+    () => showOutProvider.refresh()
+  );
+
+  // 注册命令：extension.locatateLink
+  vscode.commands.registerCommand('extension.locatateLink',
+    (link) => {
+      vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(link))
+    }
+  );
+
+  // viewTree
+  function ShowOutProvider() {
+    function threeItemFomatter (annotations) {
+      return annotations.map((v, i) => ({
+        tooltip: v.uri + ':' + (v.lineNum + 1),
+        description: v.label ,
+        label: `${i + 1}`,
+        command: {
+          title: '',
+          command: 'extension.locatateLink',
+          arguments: [`${v.uri}#${v.lineNum + 1}`]
+        }
+        // version: '',
+        // iconPath: '',
+      }))
+    }
+
+    this._onDidChangeTreeData = new vscode.EventEmitter();
+    this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+    this.refresh = () => this._onDidChangeTreeData.fire();
+    this.annotations = searchAnnotations(workspaceState, pattern).then(threeItemFomatter)
+    this.getTreeItem = function(element) {
+      return element;
+    }
+    this.getChildren = function() {
+      return this.annotations
+    }
+  }
 
   // 更新着色
   function updateDecorations() {
@@ -103,7 +142,7 @@ module.exports = (context) => {
   }
 
   // 查询注解
-  function searchAnnotations(workspaceState, pattern) {
+  function searchAnnotations(workspaceState, pattern, callback) {
     const includePattern = getPathes(settings.get('include')) || '{**/*}';
     const excludePattern = getPathes(settings.get('exclude'));
     const limitationForSearch = settings.get('maxFilesForSearch', 5120);
@@ -114,12 +153,12 @@ module.exports = (context) => {
 
     setStatusMsg(zapIcon, statusMsg);
 
-    workspace.findFiles(includePattern, excludePattern, limitationForSearch).then(function (files) {
+    return workspace.findFiles(includePattern, excludePattern, limitationForSearch).then(function (files) {
 
         if (!files || files.length === 0) {
             setStatusMsg(defaultIcon, defaultMsg);
             logger('No files found', 'warn')
-            return;
+            return [];
         }
 
         const totalFiles = files.length;
@@ -134,34 +173,47 @@ module.exports = (context) => {
             progress = Math.floor(times / totalFiles * 100);
 
             setStatusMsg(zapIcon, progress + '% ' + statusMsg);
-            // 最终输出
-            if (times === totalFiles || window.manullyCancel) {
-                window.processing = true;
-                annotationList = annotationList.concat(
-                  Object.values(annotations).reduce((acc, fileAnnotations) => acc.concat(fileAnnotations), [])
-                )
-                workspaceState.update('annotationList', annotationList);
-                setStatusMsg(defaultIcon, annotationList.length, annotationList.length + ' result(s) found');
-                showOutput(annotationList);
-            }
         }
 
-        for (let i = 0; i < totalFiles; i++) {
-            workspace.openTextDocument(files[i]).then(function (file) {
-                const fileAnnotations = searchAnnotationInFile(file, pattern);
-                annotations = { ...fileAnnotations, ...annotations }
-
-                file_iterated();
-            }, function (err) {
-                errorHandler(err);
-
-                file_iterated();
-            });
-
+        function iterated_final () {
+          if (times === totalFiles || window.manullyCancel) {
+            window.processing = true;
+            annotationList = annotationList.concat(
+              Object.values(annotations).reduce((acc, fileAnnotations) => acc.concat(fileAnnotations), [])
+              )
+              workspaceState.update('annotationList', annotationList);
+              setStatusMsg(defaultIcon, annotationList.length, annotationList.length + ' result(s) found');
+              if (callback) {
+                return callback(annotationList)
+              }
+              return annotationList
+          }
         }
-        
+
+        return new Promise((resolve) => {
+          for (let i = 0; i < totalFiles; i++) {
+              workspace.openTextDocument(files[i]).then(function (file) {
+                  const fileAnnotations = searchAnnotationInFile(file, pattern);
+                  annotations = { ...fileAnnotations, ...annotations }
+  
+                  file_iterated();
+                  iterated_final();
+                  
+                  if (times === totalFiles || window.manullyCancel) {
+                    resolve(annotationList)
+                  } 
+              }, function (err) {
+                  errorHandler(err);
+  
+                  file_iterated();
+                  iterated_final();
+              });
+          }
+        })
+
     }, function (err) {
         errorHandler(err);
+        return []
     });
   }
 
@@ -234,7 +286,7 @@ module.exports = (context) => {
     const statusBarItem = window.createStatusBarItem(vscode.StatusBarAlignment.Left);
     statusBarItem.text = defaultIcon + defaultMsg;
     statusBarItem.tooltip = 'List annotations';
-    statusBarItem.command = 'extension.main.showAllAnnotations';
+    statusBarItem.command = 'extension.todo.showAllAnnotations';
     return statusBarItem;
   };
 
@@ -359,6 +411,7 @@ function logger(msg, type = 'info') {
       console.error(msg);
       break;
     default:
+      console.log(msg);
       break;
   }
 }
