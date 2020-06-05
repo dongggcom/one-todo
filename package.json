@@ -121,12 +121,6 @@
       ]
     },
     "menus": {
-      "editor/context": [
-        {
-          "command": "extension.sayHello",
-          "group": "navigation"
-        }
-      ],
       "view/title": [
 				{
 					"command": "extension.todo.refreshTodoList",
