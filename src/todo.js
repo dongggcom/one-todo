@@ -10,7 +10,7 @@ const zapIcon = '$(zap)';
 const defaultMsg = '0';             // statusBar 
 
 module.exports = (context) => {
-  const activeEditor = window.activeTextEditor;
+  let activeEditor = window.activeTextEditor;
   const workspaceState = context.workspaceState;
   const settings = workspace.getConfiguration('oneTodo');
 
@@ -27,14 +27,15 @@ module.exports = (context) => {
     triggerUpdateDecorations();
   }
 
-  // 编辑器激活后
+  // 当前窗口切换编辑器
   window.onDidChangeActiveTextEditor(function (editor) {
+    activeEditor = editor;
     if (activeEditor) {
       triggerUpdateDecorations();
     }
   }, null, context.subscriptions);
 
-  // 工作区变化后
+  // 当前工作区编辑器更新
   workspace.onDidChangeTextDocument(function (event) {
     if (activeEditor && event.document === activeEditor.document) {
       triggerUpdateDecorations();
@@ -129,7 +130,7 @@ module.exports = (context) => {
     }
 
     Object.keys(decorationTypes).forEach((v) => {
-        const rangeOption = mathes[v];
+        const rangeOption = mathes[v] || [];
         const decorationType = decorationTypes[v];
         if (rangeOption) {
           activeEditor.setDecorations(decorationType, rangeOption);
