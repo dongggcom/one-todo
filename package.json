@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "a vscode plugin about todo list",
   "main": "src/extension.js",
+  "publisher": "donggg",
   "engines": {
     "vscode": "^1.45.0"
   },
