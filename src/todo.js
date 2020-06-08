@@ -314,8 +314,8 @@ module.exports = (context) => {
   function init(settings) {
     const _decorationTypes = {} // 着色映射
     const DEFAULT_KEYWORDS = {
-      "TODO-NOTE:": {
-          text: "TODO-NOTE:",
+      "TODO:": {
+          text: "TODO:",
           color: '#fff',
           backgroundColor: '#40a9ff',
           overviewRulerColor: 'rgba(64,169,255,0.8)'

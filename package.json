@@ -1,6 +1,6 @@
 {
   "name": "one-todo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "a vscode plugin about todo list",
   "main": "src/extension.js",
   "publisher": "donggg",
@@ -136,6 +136,7 @@
     "@types/node": "^7.0.43"
   },
   "scripts": {
+    "build": "vsce package",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
