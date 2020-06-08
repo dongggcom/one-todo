@@ -9,4 +9,4 @@
   
 **预览**
 
-![](https://github.com/dongggcom/one-todo/tree/master/images/one-todo-preview.png)
+![](https://github.com/dongggcom/one-todo/blob/master/images/one-todo-preview.gif)
