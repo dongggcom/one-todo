@@ -35,16 +35,6 @@
       "type": "object",
       "title": "one-todo插件设置",
       "properties": {
-        "oneTodo.showHomepage": {
-          "type": "boolean",
-          "default": true,
-          "description": "是否启动时显示首页"
-        },
-        "oneTodo.makeTodoFile": {
-          "type": "boolean",
-          "default": false,
-          "description": "是否生成TODO文件"
-        },
         "oneTodo.include": {
           "description": "包含文件",
           "type": "array",
